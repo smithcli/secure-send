@@ -1,0 +1,137 @@
+openapi: 3.1.0
+info:
+  title: Secure Send API
+  description: End-to-end encrypted file sharing API
+  version: 1.0.0
+
+servers:
+  - url: /secure-send
+
+paths:
+  /files:
+    get:
+      summary: Get a list of uploaded files
+      responses:
+        200:
+          description: List of uploaded files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UploadedFile'
+        400:
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Upload a file for secure sharing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileRequest'
+      responses:
+        201:
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadedFile'
+        400:
+          description: Invalid file request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
+  /files/{id}:
+    get:
+      summary: Get information about an uploaded file
+      responses:
+        200:
+          description: File information retrieved successfully
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+            Content-Type:
+              schema:
+                type: string
+        404:
+          description: File not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete an uploaded file
+      responses:
+        204:
+          description: File deleted successfully
+  
+  /download/{id}:
+    get:
+      summary: Get challenge to download shared file
+    post:
+      summary: Download shared file
+
+  /share:
+    get:
+      summary: Get keys to start a share connection stream
+    post:
+      summary: Start a share connection stream
+  /share/{id}:
+    get:
+      summary: Get keys to join a share connection stream
+    post:
+      summary: Join a share connection stream to download files
+
+components:
+  schemas:
+    FileRequest:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          format: uuid
+        value:
+          type: binary
+      example:
+        {
+          "key": "123e4567-e89b-12d3-a456-426614174000",
+          "value": "<file contents>"
+        }
+
+    UploadedFile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+          format: uuid
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          format: uuid
+        message:
+          type: string
+        code:
+          type: integer
+
+securitySchemes:
+  jwtAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
