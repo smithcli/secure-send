@@ -1,0 +1,16 @@
+[package]
+name = "secure-send"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+
+[dependencies]
+axum = "0.8.1"
+tokio = { version = "1.43.0", features = ["full"] }
+tower = "0.5.2"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["json"] }
+
+[dev-dependencies]
+anyhow = "1.0.97"
+httpc-test = "0.1.10"
